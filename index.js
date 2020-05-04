@@ -55,8 +55,7 @@ function mountMethods(abi, methodName, renderElement) {
 
         inputHtml += `<div class="col-sm-4">
         <div class="card" style="width: 18rem;">
-          <div class="card-header" data-toggle="collapse" data-target="#${item.name}-colapse" 
-          role="button" aria-expanded="false" aria-controls="${item.name}">${item.name}</div>
+          <div class="card-header" data-toggle="collapse" data-target="#${item.name}-colapse" style="cursor:pointer;" role="button" aria-expanded="false" aria-controls="${item.name}">${item.name}</div>
           <div class="collapse" id="${item.name}-colapse">
             <div class="card-body">
                 ${inputsText}
