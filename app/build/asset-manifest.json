@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/static/css/main.5bf91bfd.chunk.css",
+    "main.js": "/static/js/main.6efe4d27.chunk.js",
+    "main.js.map": "/static/js/main.6efe4d27.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.6d8ceafa.js",
+    "runtime-main.js.map": "/static/js/runtime-main.6d8ceafa.js.map",
+    "static/js/2.94dc994a.chunk.js": "/static/js/2.94dc994a.chunk.js",
+    "static/js/2.94dc994a.chunk.js.map": "/static/js/2.94dc994a.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.d26947973814d87a983be178241553cb.js": "/precache-manifest.d26947973814d87a983be178241553cb.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.5bf91bfd.chunk.css.map": "/static/css/main.5bf91bfd.chunk.css.map",
+    "static/js/2.94dc994a.chunk.js.LICENSE.txt": "/static/js/2.94dc994a.chunk.js.LICENSE.txt",
+    "static/media/img_lp_acucar.jpg": "/static/media/img_lp_acucar.5751f741.jpg",
+    "static/media/img_lp_milho.jpg": "/static/media/img_lp_milho.076db55a.jpg",
+    "static/media/img_lp_soja.jpg": "/static/media/img_lp_soja.12f96c43.jpg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.6d8ceafa.js",
+    "static/js/2.94dc994a.chunk.js",
+    "static/css/main.5bf91bfd.chunk.css",
+    "static/js/main.6efe4d27.chunk.js"
+  ]
+}
