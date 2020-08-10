@@ -4,7 +4,7 @@ import UIBlocker from 'react-ui-blocker';
 import Modal from 'react-bootstrap/Modal';
 
 import { blockUI, unblockUI } from '../actions/BlockerAction';
-import ListOwners from '../components/ListOwners';
+import Wadaag from '../components/Wadaag';
 import WadaagService from '../services/WadaagService';
 
 /**
@@ -14,8 +14,8 @@ import WadaagService from '../services/WadaagService';
  */
 class App extends Component {
     state = {
-        show: false,
-        socialContractName: '',
+        hasError: false,
+        socialContractName: '-',
     };
 
     componentDidMount() {
@@ -29,9 +29,9 @@ class App extends Component {
                     socialContractName: data,
                 });
             })
-            .catch(error => {
+            .catch(reason => {
                 this.setState({
-                    show: true,
+                    hasError: true,
                 });
             })
             .finally(() => {
@@ -47,7 +47,10 @@ class App extends Component {
     render() {
         const { blocked, blockMessage } = this.props;
 
-        const { show, socialContractName } = this.state;
+        const { 
+            hasError,
+            socialContractName,
+        } = this.state;
 
         return (
             <main role="main">
@@ -57,9 +60,10 @@ class App extends Component {
                         <p>Esta é uma página exemplo construída em <a className="text-danger" href="https://reactjs.org/">React</a> e <a className="text-danger" href="https://getbootstrap.com/">Bootstrap</a>.</p>
                     </div>
                 </div>
-                <ListOwners />
 
-                <Modal show={show}>
+                {!hasError && <Wadaag />}
+
+                <Modal show={hasError}>
                     <Modal.Header>
                         <div className="modal-title h4 text-danger">Ops!!</div>
                     </Modal.Header>
@@ -69,7 +73,7 @@ class App extends Component {
                             Não foi possível se conectar à rede blockchain.
                         </p>
                         <p>
-                            Por favor, verifique sua conexão e tente novamente.
+                            Por favor, verifique sua conexão com a rede e se o contrato esta publicado. Tente novamente.
                         </p>
                     </Modal.Body>
                 </Modal>

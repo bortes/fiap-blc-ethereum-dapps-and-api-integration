@@ -1,9 +1,13 @@
 import Web3 from 'web3'
 import Wadaag from '../contracts/Wadaag.json';
 
-export async function connect() {
-    const cache = {};
+const CONTRACT_NAME    = 'Wadaag';
+const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS_ || '0xa4675Ef1cec4FB882241787fc6CE35f0D10A5f28';
+const HTTP_PROVIDER    = process.env.REACT_APP_HTTP_PROVIDER_    || 'http://localhost:8545';
 
+const cache = {};
+
+export async function connect() {
     return new Promise(async (resolve, reject) => {
         if (cache.web3) {
             resolve(cache.web3);
@@ -23,9 +27,13 @@ export async function connect() {
         }
 
         if (window.web3) {
-            cache.web3 = new Web3(window.web3.currentProvider);
+            if (!cache.web3) {
+                cache.web3 = new Web3(window.web3.currentProvider);
+            }
         } else {
-            cache.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+            if (!cache.web3) {
+                cache.web3 = new Web3(new Web3.providers.HttpProvider(HTTP_PROVIDER));
+            }
         }
 
         resolve(cache.web3);
@@ -36,23 +44,19 @@ async function context() {
     return new Promise(async (resolve, reject) => {
         const web3 = await connect();
 
-        const networkId = await web3.eth.net.getId()
+        const abi = Wadaag.abi;
+        const address = web3.utils.isAddress(CONTRACT_ADDRESS) ? CONTRACT_ADDRESS : await web3.eth.ens.getAddress(CONTRACT_ADDRESS);
+        const contract = new web3.eth.Contract(abi, address);
 
-        const network = Wadaag.networks[networkId];
-
-        if (network) {
-            const abi = Wadaag.abi;
-            const address = network.address;
-            const contract = new web3.eth.Contract(abi, address);
-
-            resolve({
-                web3,
-                contract,
-            });
-        } else {
-            reject();
-        }
+        resolve({
+            web3,
+            contract,
+        });
     });
+}
+
+export async function getContractName() {
+    return CONTRACT_NAME;
 }
 
 export async function getSocialContractName() {
@@ -136,6 +140,7 @@ export function withdrawal() {
 const WadaagService = {
     connect,
 
+    getContractName,
     getSocialContractName,
     getTotalRegisteredOwners,
     getTotalAllowedOwners,

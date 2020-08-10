@@ -28,7 +28,7 @@ const loadState = () => {
 
         if (serialized !== null)
             return JSON.parse(serialized);
-    } catch {
+    } catch (exception) {
     }
 
     return undefined;
@@ -44,7 +44,7 @@ const saveState = (state) => {
         const serialized = JSON.stringify(state);
 
         localStorage.setItem(LOCAL_STORAGE_KEY_NAME, serialized);
-    } catch {
+    } catch (exception) {
     }
 };
 
