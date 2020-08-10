@@ -38,6 +38,8 @@ Parte das variáveis de ambiente são carregadas via arquivo **.env**. Segue lis
 |---|---|
 |**SEED_MNEMONIC**|frase/semente utilizada para recuperar a chave privada|
 |**INFURA_PROJECT_ENDPOINT**|endereço de acesso ao projeto da _Infura_|
+|**REACT_APP_CONTRACT_ADDRESS**|endereço/ENS para acesso ao contrato|
+|**REACT_APP_HTTP_PROVIDER**|endereço do servidor para acesso a rede via HTTPS|
 
 ## 3. commandos
 
@@ -98,19 +100,3 @@ Este comando irá publicar via os nós da `Infura`, utilizando a chave privada e
 > atende às especificações listadas acima
 > Tratamento de erros
 > Por tratamento de erros, será avaliado qual o retorno quando tentamos interagir de forma errada com o token
-
-Abaixo os requisitos solicitados.
-
-+ smart contract deve conter pelo menos um método pago e um não pago
-    _consultar a [documentação do contrato](./contract/README.md)_
-+ smart contract deve conter pelo menos um método não público
-    _consultar a [documentação do contrato](./contract/README.md)_
-+ smart contract deve conter pelo menos uma struct, um mapping e um array
-    _consultar a [documentação do contrato](./contract/README.md)_
-+ deploy em uma rede de teste (ropsten, kovan)
-    a publicação na rede `ropste` pode ser verificada por meio do TXID [0x2061078cdc8755a470efe07105d2075bcebbad36c19c155f09680b53c9c76ee7](https://ropsten.etherscan.io/tx/0x2061078cdc8755a470efe07105d2075bcebbad36c19c155f09680b53c9c76ee7)
-+ smart contract(s) verificado(s) https://ropsten.etherscan.io/verifycontract
-    o contrato validado por ser verificado por meio do endereço do contrato [0x5719FAd6A5240393790FC15F3EE617AA3b372318](https://ropsten.etherscan.io/address/0x5719fad6a5240393790fc15f3ee617aa3b372318#code)
-+ ens para o(s) smart contract(s)
-    o contrato foi registrado sobre o domínio `wadaag.bortes.eth`
-
