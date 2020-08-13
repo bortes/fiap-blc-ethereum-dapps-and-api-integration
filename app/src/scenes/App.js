@@ -15,7 +15,6 @@ import WadaagService from '../services/WadaagService';
 class App extends Component {
     state = {
         hasError: false,
-        socialContractName: '-',
     };
 
     componentDidMount() {
@@ -24,11 +23,6 @@ class App extends Component {
         blockUI('conectando-se a rede...');
 
         WadaagService.getSocialContractName()
-            .then(data => {
-                this.setState({
-                    socialContractName: data,
-                });
-            })
             .catch(reason => {
                 this.setState({
                     hasError: true,
@@ -49,18 +43,10 @@ class App extends Component {
 
         const { 
             hasError,
-            socialContractName,
         } = this.state;
 
         return (
             <main role="main">
-                <div className="jumbotron">
-                    <div className="container">
-                        <h1 className="display-3"><span className="text-danger">Olá</span>, {socialContractName}!!</h1>
-                        <p>Esta é uma página exemplo construída em <a className="text-danger" href="https://reactjs.org/">React</a> e <a className="text-danger" href="https://getbootstrap.com/">Bootstrap</a>.</p>
-                    </div>
-                </div>
-
                 {!hasError && <Wadaag />}
 
                 <Modal show={hasError}>
@@ -97,7 +83,6 @@ const mapStateToProps = (store) => ({
     blocked: store.blockerState.blocked,
     blockMessage: store.blockerState.blockMessage
 });
-
 
 /**
  * Mapeia os eventos na propriedade ".props" disponibilizadas dentro dos componentes.

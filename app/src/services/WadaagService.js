@@ -1,4 +1,6 @@
 import Web3 from 'web3'
+import Q from 'q';
+
 import Wadaag from '../contracts/Wadaag.json';
 
 const CONTRACT_NAME    = 'Wadaag';
@@ -7,7 +9,7 @@ const HTTP_PROVIDER    = process.env.REACT_APP_HTTP_PROVIDER_    || 'http://loca
 
 const cache = {};
 
-export async function connect() {
+async function provider() {
     return new Promise(async (resolve, reject) => {
         if (cache.web3) {
             resolve(cache.web3);
@@ -22,6 +24,10 @@ export async function connect() {
                 .catch(error => {
                     reject(error);
                 });
+
+            window.ethereum.on('accountsChanged', function (accounts) {
+                window.location.reload();
+            });
 
             return;
         }
@@ -40,18 +46,22 @@ export async function connect() {
     });
 }
 
-async function context() {
+async function contract() {
     return new Promise(async (resolve, reject) => {
-        const web3 = await connect();
+        if (cache.contract) {
+            resolve(cache.contract);
+        }
+
+        const web3 = await provider();
 
         const abi = Wadaag.abi;
         const address = web3.utils.isAddress(CONTRACT_ADDRESS) ? CONTRACT_ADDRESS : await web3.eth.ens.getAddress(CONTRACT_ADDRESS);
-        const contract = new web3.eth.Contract(abi, address);
 
-        resolve({
-            web3,
-            contract,
-        });
+        if (!cache.contract) {
+            cache.contract = new web3.eth.Contract(abi, address);
+        }
+
+        resolve(cache.contract);
     });
 }
 
@@ -59,10 +69,16 @@ export async function getContractName() {
     return CONTRACT_NAME;
 }
 
-export async function getSocialContractName() {
-    return context().then(async (context) => {
-        const { contract } = context;
+export async function getAccountAddress() {
+    return provider().then(async (web3) => {
+        const result = (await web3.eth.getAccounts())[0];
 
+        return result;
+    });
+}
+
+export async function getSocialContractName() {
+    return contract().then(async (contract) => {
         const result = await contract.methods.name().call();
 
         return result;
@@ -70,9 +86,7 @@ export async function getSocialContractName() {
 }
 
 export function getTotalRegisteredOwners() {
-    return context().then(async (context) => {
-        const { contract } = context;
-
+    return contract().then(async (contract) => {
         const result = await contract.methods.countOwners().call();
 
         return result;
@@ -80,9 +94,7 @@ export function getTotalRegisteredOwners() {
 }
 
 export function getTotalAllowedOwners() {
-    return context().then(async (context) => {
-        const { contract } = context;
-
+    return contract().then(async (contract) => {
         const result = await contract.methods.maxOwners().call();
 
         return result;
@@ -90,9 +102,7 @@ export function getTotalAllowedOwners() {
 }
 
 export function getRegisteredOwners() {
-    return context().then(async (context) => {
-        const { contract } = context;
-
+    return contract().then(async (contract) => {
         const result = await contract.methods.listOwners().call();
 
         return result;
@@ -100,17 +110,21 @@ export function getRegisteredOwners() {
 }
 
 export function getDepositedAmount() {
-    return context().then(async (context) => {
-        const { contract } = context;
-
+    return contract().then(async (contract) => {
         const result = await contract.methods.totalDeposited().call();
 
         return result;
     });
 }
 
-export function isOwner(address) {
-    // isOwner
+export function isOwner() {
+    return contract().then(async (contract) => {
+        var address = await getAccountAddress();
+
+        const result = await contract.methods.isOwner(address).call();
+
+        return result;
+    });
 }
 
 export function getBalanceOf(address) {
@@ -138,9 +152,9 @@ export function withdrawal() {
 }
 
 const WadaagService = {
-    connect,
-
     getContractName,
+    getAccountAddress,
+
     getSocialContractName,
     getTotalRegisteredOwners,
     getTotalAllowedOwners,

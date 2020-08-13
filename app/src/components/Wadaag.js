@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import Modal from 'react-bootstrap/Modal';
+import Q from 'q';
 
+import { blockUI, unblockUI } from '../actions/BlockerAction';
+import WadaagService from '../services/WadaagService';
 
 /**
  * Componente responsavel por exibir as interfaces do contrato.
@@ -9,12 +13,36 @@ import { connect } from 'react-redux';
  */
 class Wadaag extends Component {
     state = {
+        accountAddress: '',
+        contractName: '',
         socialContractName: '',
-        totalRegisteredOwners: '',
-        totalAllowedOwners: ''
+        isOwner: false
     };
 
     componentDidMount() {
+        const { blockUI, unblockUI } = this.props;
+
+        blockUI('carregando dados...');
+
+        Q.all([
+            WadaagService.getAccountAddress(),
+            WadaagService.getContractName(),
+            WadaagService.getSocialContractName(),
+            WadaagService.isOwner(),
+        ])
+            .then((data) => {
+                const [accountAddress, contractName, socialContractName, isOwner] = data;
+
+                this.setState({
+                    accountAddress,
+                    contractName,
+                    socialContractName,
+                    isOwner,
+                });
+            })
+            .finally(() => {
+                unblockUI();
+            });
     }
 
     /**
@@ -23,80 +51,38 @@ class Wadaag extends Component {
      * @author bortes
      */
     render() {
+        const {
+            accountAddress,
+            contractName,
+            socialContractName,
+        } = this.state;
 
         return (
-            <div className="container">
-                <p>
-                    <span className="text-danger">balanceOf</span>
-                    =
-                    <span>saldo do endereço</span>
-                </p>
-                <p>
-                    <span className="text-danger">countOwners</span>
-                    =
-                    <span>total de participantes</span>
-                </p>
+            <Modal centered size="lg" show={true}>
+                <Modal.Header>
+                    <Modal.Title>
+                        Seja bem vindo ao <span className="text-warning">{accountAddress}</span>!
+                    </Modal.Title>
+                </Modal.Header>
 
-                <p>
-                    <span className="text-danger">deposit</span>
-                    =
-                    <span>efetuar um deposito</span>
-                </p>
+                <Modal.Body>
+                    <p className="h5 mb-3">
+                        Você esta acessando o <span className="text-warning">{socialContractName}</span>, uma economia colaborativa do projeto <span className="text-warning">{contractName}</span>.
+                    </p>
 
-                <p>
-                    <span className="text-danger">isOwner</span>
-                    =
-                    <span>verificar se o endereço é um participantes</span>
-                </p>
+                    <p className="h5 mb-3">
+                        Você sabe o que é economia colaborativa?
+                    </p>
 
-                <p>
-                    <span className="text-danger">listOwners</span>
-                    =
-                    <span>listar os endereços participantes</span>
-                </p>
+                    <p className="h5 mb-3 pl-3 border-left font-italic">
+                        Economia colaborativa se baseia no fato de que para reduzir as diferenças sociais precisamos compartilhar ao contrário de acumular.
+                    </p>
 
-                <p>
-                    <span className="text-danger">maxOwners</span>
-                    =
-                    <span>quantidade maxima de participantes</span>
-                </p>
-
-                <p>
-                    <span className="text-danger">name</span>
-                    =
-                    <span>nome da economia</span>
-                </p>
-
-                <p>
-                    <span className="text-danger">percOf</span>
-                    =
-                    <span>% de participação do endereço</span>
-                </p>
-
-                <p>
-                    <span className="text-danger">totalDeposited</span>
-                    =
-                    <span>total geral depositado</span>
-                </p>
-
-                <p>
-                    <span className="text-danger">totalOwner</span>
-                    =
-                    <span>total depositado</span>
-                </p>
-
-                <p>
-                    <span className="text-danger">transferRatio</span>
-                    =
-                    <span>transaferência</span>
-                </p>
-
-                <p>
-                    <span className="text-danger">withdrawal</span>
-                    =
-                    <span>saque</span>
-                </p>
-            </div>
+                    <p className="h5 mb-3">
+                        Faça um depósito agora mesmo para começar a investir nesta ideia.
+                    </p>
+                </Modal.Body>
+            </Modal>
         );
     }
 }
@@ -110,4 +96,11 @@ class Wadaag extends Component {
 const mapStateToProps = (state) => ({
 })
 
-export default connect(mapStateToProps)(Wadaag);
+/**
+ * Mapeia os eventos na propriedade ".props" disponibilizadas dentro dos componentes.
+ *
+ * @author bortes
+ */
+const mapDispatchToProps = { blockUI, unblockUI };
+
+export default connect(mapStateToProps, mapDispatchToProps)(Wadaag);
