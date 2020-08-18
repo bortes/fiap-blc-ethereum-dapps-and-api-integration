@@ -1,10 +1,9 @@
 import Web3 from 'web3'
-import Q from 'q';
 
 import Wadaag from '../contracts/Wadaag.json';
 
 const CONTRACT_NAME    = 'Wadaag';
-const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS_ || '0xa4675Ef1cec4FB882241787fc6CE35f0D10A5f28';
+const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS_ || '0x56e58CcFF9366cCb513A2315EC61c059058c3153';
 const HTTP_PROVIDER    = process.env.REACT_APP_HTTP_PROVIDER_    || 'http://localhost:8545';
 
 const cache = {};
@@ -33,13 +32,9 @@ async function provider() {
         }
 
         if (window.web3) {
-            if (!cache.web3) {
-                cache.web3 = new Web3(window.web3.currentProvider);
-            }
+            cache.web3 = new Web3(window.web3.currentProvider);
         } else {
-            if (!cache.web3) {
-                cache.web3 = new Web3(new Web3.providers.HttpProvider(HTTP_PROVIDER));
-            }
+            cache.web3 = new Web3(new Web3.providers.HttpProvider(HTTP_PROVIDER));
         }
 
         resolve(cache.web3);
@@ -139,8 +134,14 @@ export function getDepositedAmountOf(address) {
     // totalOwner
 }
 
-export function deposit() {
-    // deposit
+export function deposit(amount) {
+    return contract().then(async (contract) => {
+        var address = await getAccountAddress();
+
+        const result = await contract.methods.deposit().send({from: address, value: amount, gas: 180000});
+
+        return result;
+    });
 }
 
 export function transferTo() {
