@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import UIBlocker from 'react-ui-blocker';
-import Modal from 'react-bootstrap/Modal';
+import { Alert, Modal } from 'react-bootstrap';
 
 import { blockUI, unblockUI } from '../actions/BlockerAction';
+import { unnotify } from '../actions/NotifierAction';
 import Wadaag from '../components/Wadaag';
 import WadaagService from '../services/WadaagService';
 
@@ -12,83 +13,63 @@ import WadaagService from '../services/WadaagService';
  *
  * @author bortes
  */
-class App extends Component {
-    state = {
-        hasError: false,
-    };
+function App(props) {
+    const [errorToConnect, setErrorToConnect] = useState();
 
-    componentDidMount() {
-        const { blockUI, unblockUI } = this.props;
+    const dispatch = useDispatch();
+    const blocker = useSelector(state => state.blockerState);
+    const notifier = useSelector(state => state.notifierState);
 
-        blockUI('conectando-se a rede...');
+    useEffect(() => {
+        dispatch(unnotify())
+
+        dispatch(blockUI('conectando-se a rede...'));
 
         WadaagService.getSocialContractName()
+            .then(data => {
+                setErrorToConnect(false);
+            })
             .catch(reason => {
-                this.setState({
-                    hasError: true,
-                });
+                setErrorToConnect(true);
             })
             .finally(() => {
-                unblockUI();
+                dispatch(unblockUI());
             });
-    }
+    }, []);
 
-    /**
-     * Renderiza o componente.
-     *
-     * @author bortes
-     */
-    render() {
-        const { blocked, blockMessage } = this.props;
+    return (
+        <main role="main">
+            {errorToConnect === false && <Wadaag />}
 
-        const { 
-            hasError,
-        } = this.state;
+            <Modal show={errorToConnect}>
+                <Modal.Header>
+                    <div className="modal-title h4 text-danger">Ops!!</div>
+                </Modal.Header>
 
-        return (
-            <main role="main">
-                {!hasError && <Wadaag />}
+                <Modal.Body>
+                    <p>
+                        Não foi possível se conectar à rede blockchain.
+                    </p>
+                    <p>
+                        Por favor, verifique sua conexão com a rede e se o contrato esta publicado. Tente novamente.
+                    </p>
+                </Modal.Body>
+            </Modal>
 
-                <Modal show={hasError}>
-                    <Modal.Header>
-                        <div className="modal-title h4 text-danger">Ops!!</div>
-                    </Modal.Header>
+            <Modal show={notifier.notified} backdrop={false}>
+                <Alert variant={notifier.variant} dismissible className="mb-0" onClose={() => dispatch(unnotify())}>
+                    <Alert.Heading>{notifier.title}</Alert.Heading>
+                    <p>{notifier.message}</p>
+                </Alert>
+            </Modal>
 
-                    <Modal.Body>
-                        <p>
-                            Não foi possível se conectar à rede blockchain.
-                        </p>
-                        <p>
-                            Por favor, verifique sua conexão com a rede e se o contrato esta publicado. Tente novamente.
-                        </p>
-                    </Modal.Body>
-                </Modal>
-
-                <UIBlocker
-                    theme="bounce"
-                    isVisible={blocked}
-                    message={blockMessage}
-                />
-            </main>
-        );
-    }
+            <UIBlocker
+                theme="bounce"
+                isVisible={blocker.blocked}
+                message={blocker.blockMessage}
+            />
+        </main>
+    );
 }
 
-/**
- * Mapeia os estados na propriedade ".props" disponibilizadas dentro dos componentes.
- *
- * @author bortes
- */
-const mapStateToProps = (store) => ({
-    blocked: store.blockerState.blocked,
-    blockMessage: store.blockerState.blockMessage
-});
-
-/**
- * Mapeia os eventos na propriedade ".props" disponibilizadas dentro dos componentes.
- *
- * @author bortes
- */
-const mapDispatchToProps = { blockUI, unblockUI };
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

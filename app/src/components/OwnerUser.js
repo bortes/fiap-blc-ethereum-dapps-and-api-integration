@@ -2,18 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { blockUI, unblockUI } from '../actions/BlockerAction';
-import NewUser from './NewUser';
-import OwnerUser from './OwnerUser';
 import WadaagService from '../services/WadaagService';
 
 /**
- * Componente responsavel por exibir a pagina principal.
+ * Componente responsavel por exibir a pagina para usuarios ja registrados.
  *
  * @author bortes
  */
-function Wadaag(props) {
+function OwnerUser(props) {
     const [ready, setReady] = useState(false);
-    const [isOwner, setIsOwner] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -22,7 +19,7 @@ function Wadaag(props) {
 
         WadaagService.isOwner()
             .then(data => {
-                setIsOwner(data);
+                setReady(true)
             })
             .finally(() => {
                 setReady(true)
@@ -31,17 +28,14 @@ function Wadaag(props) {
         }, []);
 
     if (!ready) {
-        return (
-            <div>
-            </div>
-        );
+        return (<div></div>);
     }
 
     return (
         <div>
-            {isOwner ? <OwnerUser /> : <NewUser />}
+            OwnerUser
         </div>
     );
 }
 
-export default Wadaag;
+export default OwnerUser;
