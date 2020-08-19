@@ -20,7 +20,7 @@ export const NotifierReducer = (state = initialState, action) => {
                 notified: action.notified,
                 variant: action.variant,
                 title: action.title,
-                message: action.message,
+                detail: action.detail,
             }
 
         case NOTIFY_ERROR_ACTION:
@@ -29,7 +29,7 @@ export const NotifierReducer = (state = initialState, action) => {
                 notified: action.notified,
                 variant: action.variant,
                 title: action.title,
-                message: action.message,
+                detail: action.detail,
             }
 
         case NOTIFY_WARNING_ACTION:
@@ -38,7 +38,7 @@ export const NotifierReducer = (state = initialState, action) => {
                 notified: action.notified,
                 variant: action.variant,
                 title: action.title,
-                message: action.message,
+                detail: action.detail,
             }
 
         case NOTIFY_INFO_ACTION:
@@ -47,7 +47,7 @@ export const NotifierReducer = (state = initialState, action) => {
                 notified: action.notified,
                 variant: action.variant,
                 title: action.title,
-                message: action.message,
+                detail: action.detail,
             }
 
         case UNNOTIFY_ACTION:
@@ -56,7 +56,7 @@ export const NotifierReducer = (state = initialState, action) => {
                 notified: action.notified,
                 variant: action.variant,
                 title: action.title,
-                message: action.message,
+                detail: action.detail,
             }
 
         default:
