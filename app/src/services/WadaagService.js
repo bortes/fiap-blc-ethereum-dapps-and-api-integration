@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import Q from 'q';
 
 import Wadaag from '../contracts/Wadaag.json';
 
@@ -42,113 +43,184 @@ async function provider() {
 }
 
 async function contract() {
-    return new Promise(async (resolve, reject) => {
-        if (cache.contract) {
-            resolve(cache.contract);
-        }
+    if (cache.contract) {
+        return cache.contract.promise;
+    }
 
-        const web3 = await provider();
+    cache.contract = Q.defer();
 
-        const abi = Wadaag.abi;
-        const address = web3.utils.isAddress(CONTRACT_ADDRESS) ? CONTRACT_ADDRESS : await web3.eth.ens.getAddress(CONTRACT_ADDRESS);
+    const web3 = await provider();
 
-        if (!cache.contract) {
-            cache.contract = new web3.eth.Contract(abi, address);
-        }
+    const abi = Wadaag.abi;
+    const address = web3.utils.isAddress(CONTRACT_ADDRESS) ? CONTRACT_ADDRESS : await web3.eth.ens.getAddress(CONTRACT_ADDRESS);
 
-        resolve(cache.contract);
-    });
+    cache.contract.resolve(new web3.eth.Contract(abi, address));
+
+    return cache.contract.promise;
 }
 
 export async function getContractName() {
-    return CONTRACT_NAME;
+    return Q.fcall(function () {
+        return CONTRACT_NAME;
+    });
 }
 
 export async function getAccountAddress() {
-    return provider().then(async (web3) => {
-        const result = (await web3.eth.getAccounts())[0];
+    const web3 = await provider();
 
-        return result;
-    });
+    const result = (await web3.eth.getAccounts())[0];
+
+    return result;
 }
 
 export async function getSocialContractName() {
-    return contract().then(async (contract) => {
-        const result = await contract.methods.name().call();
+    const instance = await contract();
 
-        return result;
-    });
+    const result = await instance.methods.name().call();
+
+    return result;
 }
 
-export function getTotalRegisteredOwners() {
-    return contract().then(async (contract) => {
-        const result = await contract.methods.countOwners().call();
+export async function getTotalRegisteredOwners() {
+    const instance = await contract();
 
-        return result;
-    });
+    const result = await instance.methods.countOwners().call();
+
+    return result;
+
 }
 
-export function getTotalAllowedOwners() {
-    return contract().then(async (contract) => {
-        const result = await contract.methods.maxOwners().call();
+export async function getTotalAllowedOwners() {
+    const instance = await contract();
 
-        return result;
-    });
+    const result = await instance.methods.maxOwners().call();
+
+    return result;
 }
 
-export function getRegisteredOwners() {
-    return contract().then(async (contract) => {
-        const result = await contract.methods.listOwners().call();
+export async function getRegisteredOwners() {
+    const instance = await contract();
 
-        return result;
-    });
+    const result = await instance.methods.listOwners().call();
+
+    return result;
 }
 
-export function getDepositedAmount() {
-    return contract().then(async (contract) => {
-        const result = await contract.methods.totalDeposited().call();
+export async function getDepositedAmount() {
+    const instance = await contract();
 
-        return result;
-    });
+    const result = await instance.methods.totalDeposited().call();
+
+    return result;
 }
 
-export function isOwner() {
-    return contract().then(async (contract) => {
-        var address = await getAccountAddress();
+export async function isOwner() {
+    const instance = await contract();
 
-        const result = await contract.methods.isOwner(address).call();
+    var address = await getAccountAddress();
 
-        return result;
-    });
+    const result = await instance.methods.isOwner(address).call();
+
+    return result;
 }
 
-export function getBalanceOf(address) {
-    // balanceOf
+export async function getBalanceOf(address) {
+    const instance = await contract();
+    
+    address = address || await getAccountAddress();
+
+    const result = await instance.methods.balanceOf(address).call();
+
+    return result;
 }
 
-export function getPercentageOf(address) {
-    // percOf
+export async function getPercentageOf(address) {
+    const instance = await contract();
+    
+    address = address || await getAccountAddress();
+
+    const result = await instance.methods.percOf(address).call();
+
+    return result;
 }
 
-export function getDepositedAmountOf(address) {
-    // totalOwner
+export async function getDepositedAmountOf(address) {
+    const instance = await contract();
+    
+    address = address || await getAccountAddress();
+
+    const result = await instance.methods.totalOwner(address).call();
+
+    return result;
 }
 
-export function deposit(amount) {
-    return contract().then(async (contract) => {
-        var address = await getAccountAddress();
+export async function deposit(amount, address) {
+    var deferred = Q.defer();
 
-        const result = await contract.methods.deposit().send({from: address, value: amount, gas: 180000});
+    const instance = await contract();
+    
+    address = address || await getAccountAddress();
 
-        return result;
-    });
+    instance.methods
+        .deposit()
+        .send({
+            from: address, 
+            value: amount, 
+            gas: 180000
+        })
+        .then(data => {
+            let message;
+            
+            message = {
+                title: 'Solicitação de depósito realizada com sucesso!',
+                detail: 'Seu solicitação foi processada e uma nova transação foi criada. Em alguns instântes um novo bloco será gerado com esta transação e então sua solicitação será atendida.'
+            };
+
+            deferred.resolve([message, data]);
+        })
+        .catch(reason => {
+            let message;
+            
+            message = {
+                title: 'Não foi possível efetuar a solicitação do depósito.',
+                detail: 'Um erro inesperado ocorreu. Verifique seu saldo e tente novamente.'
+            };
+
+            if (/: revert zero address/.test(reason.message))
+            {
+                message = {
+                    title: 'Não foi possível efetuar a solicitação do depósito.',
+                    detail: 'O endereço informado é inválido. Verifique o endereço e tente novamente mais tarde.'
+                };
+            }
+            
+            if (/: revert shares are 0/.test(reason.message))
+            {
+                message = {
+                    title: 'Não foi possível efetuar a solicitação do depósito.',
+                    detail: 'O valor do depósito esta esta zerado. Verifica o valor e tente novamente.'
+                };
+            }
+
+            if (/: revert max owners/.test(reason.message))
+            {
+                message = {
+                    title: 'Não foi possível efetuar a solicitação do depósito.',
+                    detail: 'O grupo esta fechado para novos participantes, todas as vagas disponíveis estão ocupadas. Tente novamente mais tarde.'
+                };
+            }
+
+            deferred.reject([message, reason]);
+        })
+
+    return deferred.promise;
 }
 
-export function transferTo() {
+export async function transferTo() {
     // transferRatio
 }
 
-export function withdrawal() {
+export async function withdrawal() {
     // withdrawal
 }
 
