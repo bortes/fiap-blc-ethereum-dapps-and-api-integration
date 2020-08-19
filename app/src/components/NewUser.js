@@ -57,11 +57,14 @@ function NewUser(props) {
 
         WadaagService.deposit(depositAmout)
             .then(data => {
-                dispatch(notifySuccess('Depósito realizada com sucesso!', 'Seu depósito foi solicitado e uma transação criada. Em alguns instântes um bloco registrará sua solicitação e então você fará parte desta economia colaborativa.'));
+                const [ message ] = data;
+
+                dispatch(notifySuccess(message.title, message.detail));
             })
             .catch(reason => {
-                console.log(reason)
-                dispatch(notifyError('Error ao depositar!', 'Não foi possível efetuar o depósito. Verifica o saldo do seu endereço e tente novamente.'));
+                const [ message ] = reason;
+
+                dispatch(notifyError(message.title, message.detail));
             })
             .finally(() => {
                 dispatch(unblockUI());

@@ -59,7 +59,8 @@ function App(props) {
             <Modal show={notifier.notified} backdrop={false}>
                 <Alert variant={notifier.variant} dismissible className="mb-0" onClose={() => dispatch(unnotify())}>
                     <Alert.Heading>{notifier.title}</Alert.Heading>
-                    <p>{notifier.message}</p>
+
+                    <p className="h5">{notifier.detail}</p>
                 </Alert>
             </Modal>
 
