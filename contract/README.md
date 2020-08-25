@@ -133,7 +133,7 @@ Recupera o valor total depositado pelo endereço informado.
 
 ### 1.11 transferRatio
 
-Transfere um percentual do valor total depositado por um endereço participante para um outro endereço.
+Transfere um percentual do valor total depositado por um endereço participante para um outro endereço, participante ou não.
 
 #### 1.11.1 parâmetros
 
