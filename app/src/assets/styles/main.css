@@ -1,0 +1,15 @@
+@import url('../themes/bootswatch/slate/bootstrap.css');
+
+body {
+    background-image: url('../images/backgrounds/02/bg.png');
+    /* background-repeat: no-repeat; */
+    background-size: cover;
+}
+
+.o-9 {
+    opacity: .9;
+}
+
+.h-10 {
+    min-height: 10rem;
+}
