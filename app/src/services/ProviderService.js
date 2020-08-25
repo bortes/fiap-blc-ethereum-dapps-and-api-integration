@@ -1,8 +1,8 @@
 import Web3 from 'web3'
 
-const SOCKET_PROVIDER = process.env.REACT_APP_SOCKET_PROVIDER_ || 'ws://localhost:8545';
-const HTTP_PROVIDER   = process.env.REACT_APP_HTTP_PROVIDER_ || 'http://localhost:8545';
-const CACHE           = {};
+const WS_PROVIDER   = process.env.REACT_APP_WS_PROVIDER   || 'ws://localhost:8545';
+const HTTP_PROVIDER = process.env.REACT_APP_HTTP_PROVIDER || 'http://localhost:8545';
+const CACHE         = {};
 
 export async function getProvider() {
     return new Promise(async (resolve, reject) => {
@@ -30,8 +30,8 @@ export async function getProvider() {
         if (window.web3) {
             CACHE.web3 = new Web3(window.web3.currentProvider);
         } else {
-            if (SOCKET_PROVIDER) {
-                CACHE.web3 = new Web3(new Web3.providers.WebsocketProvider(SOCKET_PROVIDER));
+            if (WS_PROVIDER) {
+                CACHE.web3 = new Web3(new Web3.providers.WebsocketProvider(WS_PROVIDER));
             } else {
                 CACHE.web3 = new Web3(new Web3.providers.HttpProvider(HTTP_PROVIDER));
             }

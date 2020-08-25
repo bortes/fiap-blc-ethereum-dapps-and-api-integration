@@ -5,7 +5,7 @@ import ProviderService from './ProviderService.js';
 import Wadaag from '../contracts/Wadaag.json';
 
 const CONTRACT_NAME    = 'Wadaag';
-const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS_ || '0x56e58CcFF9366cCb513A2315EC61c059058c3153';
+const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS || '0x56e58CcFF9366cCb513A2315EC61c059058c3153';
 const CACHE            = {};
 
 async function contract() {
