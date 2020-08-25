@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { 
+    Alert, 
+    Modal, 
+} from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import UIBlocker from 'react-ui-blocker';
-import { Alert, Modal } from 'react-bootstrap';
 
 import { blockUI, unblockUI } from '../actions/BlockerAction';
 import { unnotify } from '../actions/NotifierAction';
@@ -14,7 +17,9 @@ import WadaagService from '../services/WadaagService';
  * @author bortes
  */
 function App(props) {
-    const [errorToConnect, setErrorToConnect] = useState();
+    const [ready, setReady] = useState(false);
+
+    const [isUnavailable, setIsUnavailable] = useState(true);
 
     const dispatch = useDispatch();
     const blocker = useSelector(state => state.blockerState);
@@ -25,33 +30,38 @@ function App(props) {
 
         dispatch(blockUI('conectando-se a rede...'));
 
-        WadaagService.getSocialContractName()
+        WadaagService.isReady()
             .then(data => {
-                setErrorToConnect(false);
-            })
-            .catch(reason => {
-                setErrorToConnect(true);
+                setIsUnavailable(false);
             })
             .finally(() => {
+                setReady(true)
                 dispatch(unblockUI());
             });
     }, []);
 
+    if (!ready) {
+        return null;
+    }
+
     return (
         <main role="main">
-            {errorToConnect === false && <Wadaag />}
+            {!isUnavailable && <Wadaag />}
 
-            <Modal show={errorToConnect}>
+            <Modal show={isUnavailable}>
                 <Modal.Header>
-                    <div className="modal-title h4 text-danger">Ops!!</div>
+                    <Modal.Title as="h3" className="text-danger">
+                        Ops!!
+                    </Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                    <p>
-                        Não foi possível se conectar à rede blockchain.
+                    <p className="h5 mb-5">
+                        Não é possível conectar-se à rede blockchain.
                     </p>
-                    <p>
-                        Por favor, verifique sua conexão com a rede e se o contrato esta publicado. Tente novamente.
+
+                    <p className="h5">
+                        Por favor, <span className="text-warning">verifique sua conexão</span> com a rede e tente novamente.
                     </p>
                 </Modal.Body>
             </Modal>
