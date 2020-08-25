@@ -145,7 +145,7 @@ export async function deposit(amount) {
             
             message = {
                 title: 'Não foi possível efetuar a solicitação do depósito.',
-                detail: 'Um erro inesperado ocorreu. Verifique seu saldo e tente novamente.'
+                detail: 'Ocorreu um erro inesperado. Verifique seu saldo e tente novamente.'
             };
 
             if (/: revert zero address/.test(reason.message)) {
@@ -203,7 +203,7 @@ export async function transferTo(to, amount) {
 
             message = {
                 title: 'Não foi possível efetuar a solicitação de transferência.',
-                detail: 'Um erro inesperado ocorreu. Verifique seu saldo e tente novamente.'
+                detail: 'Ocorreu um erro inesperado. Verifique seu saldo e tente novamente.'
             };
 
             if (/: revert zero address/.test(reason.message)) {
@@ -275,7 +275,7 @@ export async function withdrawal() {
             
             message = {
                 title: 'Não foi possível efetuar a solicitação de saque.',
-                detail: 'Um erro inesperado ocorreu. Verifique seu saldo e tente novamente.'
+                detail: 'Ocorreu um erro inesperado. Verifique seu saldo e tente novamente.'
             };
 
             if (/: balance is zero/.test(reason.message)) {
